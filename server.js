@@ -3,10 +3,11 @@ const multer = require("multer");
 const { S3Client, PutObjectCommand, ListObjectsV2Command } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 const sharp = require("sharp");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // S3 Client setup
 const s3 = new S3Client({ region: process.env.AWS_REGION || "us-east-1" });
