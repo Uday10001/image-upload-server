@@ -43,7 +43,7 @@ Create a `.env` file in the root directory and add your AWS credentials:
 
 ```env
 PORT=3000
-AWS_REGION=us-east-1
+AWS_REGION=ap-south-1
 S3_BUCKET=your-s3-bucket-name
 AWS_ACCESS_KEY_ID=your-aws-access-key-id
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
