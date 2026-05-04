@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend1:
-    build: .
+    image: image-upload-server-backend
     environment:
       - PORT=3000
       - AWS_REGION=${AWS_REGION}
@@ -13,7 +13,7 @@ services:
       - "3001:3000"
 
   backend2:
-    build: .
+    image: image-upload-server-backend
     environment:
       - PORT=3000
       - AWS_REGION=${AWS_REGION}
