@@ -1,11 +1,12 @@
 const express = require("express");
 const multer = require("multer");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, ListObjectsV2Command } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 const sharp = require("sharp");
 require("dotenv").config();
 
 const app = express();
+app.use(express.static("public"));
 
 // S3 Client setup
 const s3 = new S3Client({ region: process.env.AWS_REGION || "us-east-1" });
@@ -75,6 +76,40 @@ app.post("/upload", (req, res, next) => {
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ error: "Failed to upload image to S3", details: err.message });
+  }
+});
+
+// Get the last 5 uploaded images
+app.get("/images", async (req, res) => {
+  try {
+    const bucket = process.env.S3_BUCKET;
+    const region = process.env.AWS_REGION || "us-east-1";
+    
+    const command = new ListObjectsV2Command({
+      Bucket: bucket,
+    });
+
+    const response = await s3.send(command);
+    
+    if (!response.Contents) {
+      return res.status(200).json({ images: [] });
+    }
+
+    // Sort by LastModified in descending order (newest first)
+    const sortedObjects = response.Contents.sort((a, b) => b.LastModified - a.LastModified);
+    
+    // Take the top 5
+    const top5 = sortedObjects.slice(0, 5);
+    
+    // Map to public URLs
+    const images = top5.map(obj => {
+      return `https://${bucket}.s3.${region}.amazonaws.com/${obj.Key}`;
+    });
+
+    res.status(200).json({ images });
+  } catch (err) {
+    console.error("Fetch images error:", err);
+    res.status(500).json({ error: "Failed to fetch images", details: err.message });
   }
 });
 
